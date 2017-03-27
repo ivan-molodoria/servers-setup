@@ -1,0 +1,10 @@
+---
+- hosts: web1
+  sudo: true
+
+  tasks:
+  - name: install apache
+    apt:
+     name: apache2
+     state: latest
+     update_cache: yes

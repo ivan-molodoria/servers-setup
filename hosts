@@ -1,0 +1,12 @@
+[webservers]
+
+web1 192.168.56.101 ansible_port= 2222
+#web2 192.168.56.102 ansible_port
+
+#[loadbalancer]
+
+#lb 192.168.56.103 ansible_port =2222
+
+#[jenkins]
+
+#jenkins 192.168.56.104 ansible_port =2222
