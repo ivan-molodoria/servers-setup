@@ -1,11 +1,10 @@
 [webservers]
 
-web1 192.168.56.101 ansible_port= 2222
-#web2 192.168.56.102 ansible_port
+192.168.56.101 ansible_ssh_private_key_file=/home/ivan/.vagrant.d/insecure_private_key  #ansible_ssh_port=2222 
+192.168.56.102 ansible_ssh_private_key_file=/home/ivan/.vagrant.d/insecure_private_key
 
-#[loadbalancer]
-
-#lb 192.168.56.103 ansible_port =2222
+[loadbalancer]
+192.168.56.103 ansible_ssh_private_key_file=/home/ivan/.vagrant.d/insecure_private_key
 
 #[jenkins]
 
