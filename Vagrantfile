@@ -50,10 +50,17 @@ config.vm.box = "trusty64"
     end
   end
 
-#  config.vm.provision :ansible do |ansible|
-#    ansible.verbose = "v"
-#    ansible.playbook = "playbook.yml"
-#    ansible.inventory_path ="hosts" 
-#  end
-
+  config.vm.provision :ansible do |ansible|
+    ansible.verbose = "v"
+    ansible.playbook = "playbook.yml"
+    ansible.inventory_path ="hosts" 
+  end
 end
+
+#Vagrant.configure(2) do |config2|
+ # config2.vm.provision :ansible do |ansible|
+  #  ansible.verbose = "v"
+   # ansible.playbook = "playbook.yml"
+    #ansible.inventory_path ="hosts"
+ # end
+#end

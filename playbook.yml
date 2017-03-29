@@ -1,11 +1,39 @@
 ---
-- hosts: webservers
-  remote_user: vagrant
-  sudo: true
+ - hosts: web1
+   gather_facts: no
+   remote_user: vagrant
+   sudo: true
 
-  tasks:
-  - name: install apache
-    apt:
-     name: apache2
-     state: latest
-     update_cache: yes
+   tasks:
+   - name: install apache
+     apt:
+      name: apache2
+      state: latest
+      update_cache: yes
+  
+   - name: Copy file remotely
+     copy: src=/home/ivan/vagrants/servers-setup/index1.html dest=/var/www/index.html owner=root group=root mode=0644
+
+ - hosts: web2
+   remote_user: vagrant
+   sudo: true
+   gather_facts: no
+   
+   tasks:
+   - name: install apache
+     apt:
+      name: apache2
+      state: latest
+      update_cache: yes
+  
+   - name: Copy file remotely
+     copy: src=/home/ivan/vagrants/servers-setup/index2.html dest=/var/www/index.html owner=root group=root mode=0644
+
+ - hosts: lb
+   remote_user: vagrant
+   sudo: true
+   gather_facts: no
+
+   tasks:
+   - name: haproxy install 
+        
