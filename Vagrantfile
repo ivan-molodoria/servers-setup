@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 Vagrant.configure(2) do |config|
-config.vm.box = "trusty64"
+config.vm.box = "ubuntu/trusty64"
 #config.vm.box_check_update = false
 
 
@@ -13,7 +13,7 @@ config.vm.box = "trusty64"
     web1.vm.provider :virtualbox do |v|
       v.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
       v.customize ["modifyvm", :id, "--memory", 256]
-      v.customize ["modifyvm", :id, "--name", "web"]
+      v.customize ["modifyvm", :id, "--name", "web1"]
     end
   end
 
