@@ -10,30 +10,113 @@
       name: apache2
       state: latest
       update_cache: yes
-  
+
    - name: Copy file remotely
-     copy: src=/home/ivan/vagrants/servers-setup/index1.html dest=/var/www/index.html owner=root group=root mode=0644
+     copy: src=/home/ivan/vagrants/servers-setup/index1.html dest=/var/www/html/index.html owner=root group=root mode=0644
 
  - hosts: web2
    remote_user: vagrant
    sudo: true
    gather_facts: no
-   
+
    tasks:
    - name: install apache
      apt:
       name: apache2
       state: latest
       update_cache: yes
-  
+
    - name: Copy file remotely
-     copy: src=/home/ivan/vagrants/servers-setup/index2.html dest=/var/www/index.html owner=root group=root mode=0644
+     copy: src=/home/ivan/vagrants/servers-setup/index2.html dest=/var/www/html/index.html owner=root group=root mode=0644
 
  - hosts: lb
    remote_user: vagrant
    sudo: true
    gather_facts: no
+   vars:
+    haproxy_app_name: myapp
+    haproxy_mode: http
+    haproxy_enable_stats: enable
+    haproxy_algorithm: roundrobin
+    haproxy_backend_servers:
+     - {name: server1, ip: 192.168.56.101, port: 80, paramstring: cookie A check}
+     - {name: server2, ip: 192.168.56.102, port: 80, paramstring: cookie A check}
+    haproxy_stats_users:
+     - {username: vagrant, password: vagrant}
+
 
    tasks:
-   - name: haproxy install 
-        
+   - name: haproxy install
+     apt:
+      name: haproxy
+      state: latest
+      update_cache: yes
+
+   - name: Enable HAProxy service
+     action: service name=haproxy enabled=yes
+
+   - name: Enable init script
+     replace: dest='/etc/default/haproxy'
+      regexp='ENABLED=0'
+      replace='ENABLED=1'
+
+   - name: Update HAProxy config
+     template: src=templates/haproxy.cfg
+      dest=/etc/haproxy/haproxy.cfg
+      backup=yes
+     notify:
+     - restart haproxy
+
+   handlers:
+   - name: restart haproxy
+     service: name=haproxy state=restarted
+
+ - hosts: jenkins
+   remote_user: vagrant
+   sudo: true
+   gather_facts: no
+
+   tasks:
+   - name: install python
+     apt:
+      name: python-software-properties
+      state: latest
+      update_cache: no
+
+   - name: add repo
+     apt_repository:
+      repo: 'ppa:webupd8team/java'
+      update_cache: yes
+
+   - name: Accept Java 8 License
+     debconf: name='oracle-java8-installer' question='shared/accepted-oracle-license-v1-1' value='true' vtype='select'
+
+   - name: install java8
+     apt:
+      name: oracle-java8-installer
+      state: latest
+      update_cache: no
+
+   - name: install git
+     apt:
+      name: git
+      state: present
+
+   - name: add repo key
+     shell: wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | sudo apt-key add -
+
+   - name: add repo
+     shell: sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+
+   - name: update
+     shell: apt-get update
+
+   - name: install Jenkins
+     apt:
+      name: jenkins
+      state: present
+
+   - name: remove jenkins initialization file
+     file:
+      path: /var/lib/jenkins/secrets/initialAdminPassword
+      state: absent
