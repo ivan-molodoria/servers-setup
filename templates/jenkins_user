@@ -1,11 +1,19 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <user>
   <fullName>admin</fullName>
+  <description></description>
   <properties>
     <jenkins.security.ApiTokenProperty>
-      <apiToken>{AQAAABAAAAAwjxcHINUlcoA3j7Q+abQl0ciQLIp8lMjfh8sKht4TYROwgNu3rtUx77pQUgm9q590YrUJa9+0sSNyfW9V8FRcYw==}</apiToken>
+      <apiToken>{AQAAABAAAAAwH0TMqZvCJ/aAVzUvlw+OZN+9xwJ6suVpQZs6RCf02Kjvz0u3T2hPq6dTV5pCnnupoYxXiczQsHstuQju+e3mYw==}</apiToken>
     </jenkins.security.ApiTokenProperty>
+    <jenkins.security.LastGrantedAuthoritiesProperty>
+      <roles>
+        <string>authenticated</string>
+      </roles>
+      <timestamp>1490961460299</timestamp>
+    </jenkins.security.LastGrantedAuthoritiesProperty>
     <hudson.model.MyViewsProperty>
+      <primaryViewName></primaryViewName>
       <views>
         <hudson.model.AllView>
           <owner class="hudson.model.MyViewsProperty" reference="../../.."/>
@@ -19,12 +27,13 @@
     <hudson.model.PaneStatusProperties>
       <collapsed/>
     </hudson.model.PaneStatusProperties>
+    <hudson.security.HudsonPrivateSecurityRealm_-Details>
+      <passwordHash>#jbcrypt:$2a$10$yOLRwHl9KYoKJaWmesmkGut296a/Xn6/MTgNHduK/tn2B2Wjm8wb6</passwordHash>
+    </hudson.security.HudsonPrivateSecurityRealm_-Details>
+    <org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl>
+      <authorizedKeys></authorizedKeys>
+    </org.jenkinsci.main.modules.cli.auth.ssh.UserPropertyImpl>
     <hudson.search.UserSearchProperty>
       <insensitiveSearch>false</insensitiveSearch>
     </hudson.search.UserSearchProperty>
-    <hudson.security.HudsonPrivateSecurityRealm_-Details>
-      <passwordHash>#jbcrypt:$2a$10$razd3L1aXndFfBNHO95aj.IVrFydsxkcQCcLmujmFQzll3hcUrY7S</passwordHash>
-    </hudson.security.HudsonPrivateSecurityRealm_-Details>
   </properties>
-</user>
-

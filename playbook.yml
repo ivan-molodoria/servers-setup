@@ -12,7 +12,7 @@
       update_cache: yes
 
    - name: Copy file remotely
-     copy: src=/home/ivan/vagrant/servers-setup/index1.html dest=/var/www/html/index.html owner=root group=root mode=0644
+     copy: src=index1.html dest=/var/www/html/index.html owner=root group=root mode=0644
 
  - hosts: web2
    remote_user: vagrant
@@ -27,7 +27,7 @@
       update_cache: yes
 
    - name: Copy file remotely
-     copy: src=/home/ivan/vagrant/servers-setup/index2.html dest=/var/www/html/index.html owner=root group=root mode=0644
+     copy: src=index2.html dest=/var/www/html/index.html owner=root group=root mode=0644
 
  - hosts: lb
    remote_user: vagrant
@@ -75,6 +75,10 @@
    remote_user: vagrant
    sudo: true
    gather_facts: no
+   my_jenkins_params:
+      url_username: admin
+      url_password: password
+      url: http://localhost:8080
 
    tasks:
    - name: install python
@@ -102,6 +106,9 @@
       name: git
       state: present
 
+   - name: Install Maven
+     apt: name=maven state=latest
+
    - name: add repo key
      shell: wget -q -O - https://pkg.jenkins.io/debian/jenkins-ci.org.key | sudo apt-key add -
 
@@ -122,8 +129,122 @@
       state: absent
 
    - name: Update user config
-     template: 
+     template:
       src=templates/jenkins_user
-      dest=/var/lib/jenkins/users/admin/config.xml 
+      dest=/var/lib/jenkins/users/admin/config.xml
       backup=yes
 
+   - name: Disable websetup
+     lineinfile:
+        dest: /etc/default/jenkins
+        insertbefore: "^JENKINS_ARGS.*"
+        line: 'JAVA_ARGS="-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false"'
+     register: jenkins_defaults
+
+   - name: Jenkins restart
+     service:
+      name: jenkins
+      state: restarted
+
+   - name: Wait until Jenkins will up
+     wait_for: port=8080
+
+###### Just good one to wait for somthing will up ####
+#      uri:
+#      url: http://localhost:8080
+#      status_code: 200
+#      timeout: 5
+#     register: jenkins_service_status
+  # Keep trying for 5 mins in 5 sec intervals
+#     retries: 60
+#     delay: 5
+#     until: >
+#       'status' in jenkins_service_status and
+#       jenkins_service_status['status'] == 200
+
+   - name: Add plugin
+     jenkins_plugin:
+      name: conditional-buildstep
+      state: present
+
+   - name: Jenkins restart
+     service:
+      name: jenkins
+      state: restarted
+
+   - name: Wait until Jenkins will up
+     pause:
+      seconds: 30
+
+   - name: Copy new Jenkins config
+     copy:
+      src: ./templates/config.xml
+      dest: /var/lib/jenkins/
+
+   - name: Restart Jenkins
+     service: name=jenkins state=restarted
+
+   - name: Pause after restart Jenkins
+     pause: seconds=30
+
+   - name: Wait for Jenkins to become available
+     wait_for: port=8080
+
+### Install Jenkins plugins ###
+
+   - name: Install email-ext plugin
+     jenkins_plugin:
+      name: 'email-ext'
+      params: '{{ my_jenkins_params }}'
+
+   - name: Install timestamper plugin
+     jenkins_plugin:
+      name: 'timestamper'
+      params: '{{ my_jenkins_params }}'
+
+   - name: Wait after install timestamper plugin
+     pause: seconds=30
+
+   - name: Install github plugin
+     jenkins_plugin:
+      name: 'github'
+      params: '{{ my_jenkins_params }}'
+
+   - name: Install cloudbees-folder plugin
+     jenkins_plugin:
+      name: 'cloudbees-folder'
+      params: '{{ my_jenkins_params }}'
+
+   - name: Install rebuild plugin
+     jenkins_plugin:
+      name: 'rebuild'
+      params: '{{ my_jenkins_params }}'
+
+   - name: Install ssh-slaves plugin
+     jenkins_plugin:
+      name: 'ssh-slaves'
+      params: '{{ my_jenkins_params }}'
+
+   - name: Install plain-credential plugin
+     jenkins_plugin:
+      name: 'plain-credentials'
+      params: '{{ my_jenkins_params }}'
+
+   - name: Install ansible plugin
+     jenkins_plugin:
+      name: 'ansible'
+      params: '{{ my_jenkins_params }}'
+
+   - name: Install conditional-buildstep plugin
+     jenkins_plugin:
+      name: 'conditional-buildstep'
+      params: '{{ my_jenkins_params }}'
+
+   - name: Restart Jenkins
+     service: name=jenkins state=restarted
+
+   - name: Pause after restart Jenkins
+     pause: seconds=30
+
+   - name: Wait for Jenkins to become available
+     wait_for: port=8080
